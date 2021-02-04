@@ -27,11 +27,11 @@ resource "aws_route_table" "public" {
 resource "aws_route" "public_internet_gateway" {
   count = "${length(var.public_subnets) > 0 ? 1 : 0}"
 
-  //route_table_id         = "${aws_route_table.public.id}"
-  route_table_id            = "${aws_route_table.public[count.index]}"
+  route_table_id         = "${aws_route_table.public.id}"
+  //route_table_id            = "${aws_route_table.public[count.index]}"
   destination_cidr_block = "0.0.0.0/0"
-  //gateway_id             = "${aws_internet_gateway.mod.id}"
-  gateway_id             = "${aws_internet_gateway.mod[count.index]}"
+  gateway_id             = "${aws_internet_gateway.mod.id}"
+  //gateway_id             = "${aws_internet_gateway.mod[count.index]}"
 }
 
 resource "aws_route" "private_nat_gateway" {
@@ -127,15 +127,15 @@ resource "aws_nat_gateway" "natgw" {
 
 data "aws_vpc_endpoint_service" "s3" {
   service = "s3"
-  service_type = "Gateway"
+  //service_type = "Gateway"
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  //count = "${var.enable_s3_endpoint}"
-  count = 0
+  count = "${var.enable_s3_endpoint}"
+  //count = 0
 
-//  vpc_id       = "${aws_vpc.mod.id}"
-  vpc_id       = "${aws_vpc.mod[count.index]}"
+vpc_id       = "${aws_vpc.mod.id}"
+ //vpc_id       = "${aws_vpc.mod[count.index]}"
   service_name = "com.amazonaws.eu-west-1.s3"
   //service_name = "${data.aws_vpc_endpoint_service.s3.service_name}"
 }
@@ -143,18 +143,18 @@ resource "aws_vpc_endpoint" "s3" {
 resource "aws_vpc_endpoint_route_table_association" "private_s3" {
   count = "${var.enable_s3_endpoint ? length(var.private_subnets) : 0}"
 
-  //vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
-  vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"  
+  vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
+  //vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"  
   route_table_id  = "${element(aws_route_table.private.*.id, count.index)}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "public_s3" {
   count = "${var.enable_s3_endpoint ? length(var.public_subnets) : 0}"
 
-  vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"
-  //vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
-  //route_table_id  = "${aws_route_table.public.id}"
-  route_table_id  = "${aws_route_table.public[count.index]}"
+  //vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"
+  vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
+  route_table_id  = "${aws_route_table.public.id}"
+  //route_table_id  = "${aws_route_table.public[count.index]}"
 }
 
 data "aws_vpc_endpoint_service" "dynamodb" {
@@ -162,8 +162,8 @@ data "aws_vpc_endpoint_service" "dynamodb" {
 }
 
 resource "aws_vpc_endpoint" "dynamodb" {
-  //count = "${var.enable_dynamodb_endpoint}"
-  count = 0
+  count = "${var.enable_dynamodb_endpoint}"
+  //count = 0
 
   vpc_id       = "${aws_vpc.mod.id}"
   service_name = "${data.aws_vpc_endpoint_service.dynamodb.service_name}"
@@ -172,18 +172,18 @@ resource "aws_vpc_endpoint" "dynamodb" {
 resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
   count = "${var.enable_dynamodb_endpoint ? length(var.private_subnets) : 0}"
 
-  //vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
-  vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb[count.index]}"
+  vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
+  //vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb[count.index]}"
   route_table_id  = "${element(aws_route_table.private.*.id, count.index)}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
   count = "${var.enable_dynamodb_endpoint ? length(var.public_subnets) : 0}"
 
-  //vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
-  vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb[count.index]}"
-  //route_table_id  = "${aws_route_table.public.id}"
-  route_table_id  = "${aws_route_table.public[count.index]}"
+  vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
+  //vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb[count.index]}"
+  route_table_id  = "${aws_route_table.public.id}"
+  //route_table_id  = "${aws_route_table.public[count.index]}"
 }
 
 resource "aws_route_table_association" "private" {
@@ -211,6 +211,6 @@ resource "aws_route_table_association" "public" {
   count = "${length(var.public_subnets)}"
 
   subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
-  //route_table_id = "${aws_route_table.public.id}"
-  route_table_id = "${aws_route_table.public[count.index]}"
+  route_table_id = "${aws_route_table.public.id}"
+  //route_table_id = "${aws_route_table.public[count.index]}"
 }
