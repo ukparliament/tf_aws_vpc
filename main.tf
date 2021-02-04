@@ -131,7 +131,8 @@ data "aws_vpc_endpoint_service" "s3" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  count = "${var.enable_s3_endpoint}"
+  //count = "${var.enable_s3_endpoint}"
+  count = 0
 
 //  vpc_id       = "${aws_vpc.mod.id}"
   vpc_id       = "${aws_vpc.mod[count.index]}"
