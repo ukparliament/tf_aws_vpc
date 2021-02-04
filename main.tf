@@ -125,6 +125,7 @@ resource "aws_nat_gateway" "natgw" {
 
 data "aws_vpc_endpoint_service" "s3" {
   service = "s3"
+   service_type = "Gateway"
 }
 
 resource "aws_vpc_endpoint" "s3" {
