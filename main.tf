@@ -4,7 +4,7 @@ resource "aws_vpc" "mod" {
   enable_dns_hostnames = "${var.enable_dns_hostnames}"
   enable_dns_support   = "${var.enable_dns_support}"
 
-  tags = "${merge(var.tags, map("Name", format("%s", var.name)))}"
+  //tags = "${merge(var.tags, map("Name", format("%s", var.name)))}"
 }
 
 resource "aws_internet_gateway" "mod" {
@@ -12,7 +12,7 @@ resource "aws_internet_gateway" "mod" {
 
   vpc_id = "${aws_vpc.mod.id}"
 
-  tags = "${merge(var.tags, map("Name", format("%s-igw", var.name)))}"
+  //tags = "${merge(var.tags, map("Name", format("%s-igw", var.name)))}"
 }
 
 resource "aws_route_table" "public" {
@@ -58,7 +58,7 @@ resource "aws_subnet" "private" {
   cidr_block        = "${var.private_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  tags = "${merge(var.tags, var.private_subnet_tags, map("Name", format("%s-subnet-private-%s", var.name, element(var.azs, count.index))))}"
+  //tags = "${merge(var.tags, var.private_subnet_tags, map("Name", format("%s-subnet-private-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_subnet" "database" {
@@ -68,7 +68,7 @@ resource "aws_subnet" "database" {
   cidr_block        = "${var.database_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  tags = "${merge(var.tags, var.database_subnet_tags, map("Name", format("%s-subnet-database-%s", var.name, element(var.azs, count.index))))}"
+  //tags = "${merge(var.tags, var.database_subnet_tags, map("Name", format("%s-subnet-database-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_db_subnet_group" "database" {
@@ -78,7 +78,7 @@ resource "aws_db_subnet_group" "database" {
   description = "Database subnet groups for ${var.name}"
   subnet_ids  = ["${aws_subnet.database.*.id}"]
 
-  tags = "${merge(var.tags, map("Name", format("%s-database-subnet-group", var.name)))}"
+  //tags = "${merge(var.tags, map("Name", format("%s-database-subnet-group", var.name)))}"
 }
 
 resource "aws_subnet" "elasticache" {
@@ -88,7 +88,7 @@ resource "aws_subnet" "elasticache" {
   cidr_block        = "${var.elasticache_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  tags = "${merge(var.tags, var.elasticache_subnet_tags, map("Name", format("%s-subnet-elasticache-%s", var.name, element(var.azs, count.index))))}"
+  //tags = "${merge(var.tags, var.elasticache_subnet_tags, map("Name", format("%s-subnet-elasticache-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_elasticache_subnet_group" "elasticache" {
@@ -107,7 +107,7 @@ resource "aws_subnet" "public" {
   availability_zone       = "${element(var.azs, count.index)}"
   map_public_ip_on_launch = "${var.map_public_ip_on_launch}"
 
-  tags = "${merge(var.tags, var.public_subnet_tags, map("Name", format("%s-subnet-public-%s", var.name, element(var.azs, count.index))))}"
+ // tags = "${merge(var.tags, var.public_subnet_tags, map("Name", format("%s-subnet-public-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_eip" "nateip" {
