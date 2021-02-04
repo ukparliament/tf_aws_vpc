@@ -162,7 +162,8 @@ data "aws_vpc_endpoint_service" "dynamodb" {
 }
 
 resource "aws_vpc_endpoint" "dynamodb" {
-  count = "${var.enable_dynamodb_endpoint}"
+  //count = "${var.enable_dynamodb_endpoint}"
+  count = 0
 
   vpc_id       = "${aws_vpc.mod.id}"
   service_name = "${data.aws_vpc_endpoint_service.dynamodb.service_name}"
