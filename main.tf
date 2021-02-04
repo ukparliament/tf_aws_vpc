@@ -125,14 +125,15 @@ resource "aws_nat_gateway" "natgw" {
 
 data "aws_vpc_endpoint_service" "s3" {
   service = "s3"
-   service_type = "Gateway"
+  //service_type = "Gateway"
 }
 
 resource "aws_vpc_endpoint" "s3" {
   count = "${var.enable_s3_endpoint}"
 
   vpc_id       = "${aws_vpc.mod.id}"
-  service_name = "${data.aws_vpc_endpoint_service.s3.service_name}"
+  service_name = "com.amazonaws.eu-west-1.s3"
+  //service_name = "${data.aws_vpc_endpoint_service.s3.service_name}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "private_s3" {
