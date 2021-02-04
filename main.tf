@@ -4,7 +4,7 @@ resource "aws_vpc" "mod" {
   enable_dns_hostnames = "${var.enable_dns_hostnames}"
   enable_dns_support   = "${var.enable_dns_support}"
 
-  //tags = "${merge(var.tags, map("Name", format("%s", var.name)))}"
+  tags = "${merge(var.tags, map("Name", format("%s", var.name)))}"
 }
 
 resource "aws_internet_gateway" "mod" {
@@ -12,7 +12,7 @@ resource "aws_internet_gateway" "mod" {
 
   vpc_id = "${aws_vpc.mod.id}"
 
-  //tags = "${merge(var.tags, map("Name", format("%s-igw", var.name)))}"
+  tags = "${merge(var.tags, map("Name", format("%s-igw", var.name)))}"
 }
 
 resource "aws_route_table" "public" {
@@ -28,10 +28,8 @@ resource "aws_route" "public_internet_gateway" {
   count = "${length(var.public_subnets) > 0 ? 1 : 0}"
 
   route_table_id         = "${aws_route_table.public.id}"
-  //route_table_id            = "${aws_route_table.public[count.index]}"
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = "${aws_internet_gateway.mod.id}"
-  //gateway_id             = "${aws_internet_gateway.mod[count.index]}"
 }
 
 resource "aws_route" "private_nat_gateway" {
@@ -58,7 +56,7 @@ resource "aws_subnet" "private" {
   cidr_block        = "${var.private_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  //tags = "${merge(var.tags, var.private_subnet_tags, map("Name", format("%s-subnet-private-%s", var.name, element(var.azs, count.index))))}"
+  tags = "${merge(var.tags, var.private_subnet_tags, map("Name", format("%s-subnet-private-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_subnet" "database" {
@@ -68,7 +66,7 @@ resource "aws_subnet" "database" {
   cidr_block        = "${var.database_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  //tags = "${merge(var.tags, var.database_subnet_tags, map("Name", format("%s-subnet-database-%s", var.name, element(var.azs, count.index))))}"
+  tags = "${merge(var.tags, var.database_subnet_tags, map("Name", format("%s-subnet-database-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_db_subnet_group" "database" {
@@ -78,7 +76,7 @@ resource "aws_db_subnet_group" "database" {
   description = "Database subnet groups for ${var.name}"
   subnet_ids  = ["${aws_subnet.database.*.id}"]
 
-  //tags = "${merge(var.tags, map("Name", format("%s-database-subnet-group", var.name)))}"
+  tags = "${merge(var.tags, map("Name", format("%s-database-subnet-group", var.name)))}"
 }
 
 resource "aws_subnet" "elasticache" {
@@ -88,7 +86,7 @@ resource "aws_subnet" "elasticache" {
   cidr_block        = "${var.elasticache_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
 
-  //tags = "${merge(var.tags, var.elasticache_subnet_tags, map("Name", format("%s-subnet-elasticache-%s", var.name, element(var.azs, count.index))))}"
+  tags = "${merge(var.tags, var.elasticache_subnet_tags, map("Name", format("%s-subnet-elasticache-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_elasticache_subnet_group" "elasticache" {
@@ -107,7 +105,7 @@ resource "aws_subnet" "public" {
   availability_zone       = "${element(var.azs, count.index)}"
   map_public_ip_on_launch = "${var.map_public_ip_on_launch}"
 
- // tags = "${merge(var.tags, var.public_subnet_tags, map("Name", format("%s-subnet-public-%s", var.name, element(var.azs, count.index))))}"
+ tags = "${merge(var.tags, var.public_subnet_tags, map("Name", format("%s-subnet-public-%s", var.name, element(var.azs, count.index))))}"
 }
 
 resource "aws_eip" "nateip" {
@@ -132,10 +130,9 @@ data "aws_vpc_endpoint_service" "s3" {
 
 resource "aws_vpc_endpoint" "s3" {
   count = "${var.enable_s3_endpoint}"
-  //count = 0
+
 
 vpc_id       = "${aws_vpc.mod.id}"
- //vpc_id       = "${aws_vpc.mod[count.index]}"
   service_name = "com.amazonaws.eu-west-1.s3"
   //service_name = "${data.aws_vpc_endpoint_service.s3.service_name}"
 }
@@ -144,17 +141,14 @@ resource "aws_vpc_endpoint_route_table_association" "private_s3" {
   count = "${var.enable_s3_endpoint ? length(var.private_subnets) : 0}"
 
   vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
-  //vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"  
   route_table_id  = "${element(aws_route_table.private.*.id, count.index)}"
 }
 
 resource "aws_vpc_endpoint_route_table_association" "public_s3" {
   count = "${var.enable_s3_endpoint ? length(var.public_subnets) : 0}"
 
-  //vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"
   vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
   route_table_id  = "${aws_route_table.public.id}"
-  //route_table_id  = "${aws_route_table.public[count.index]}"
 }
 
 data "aws_vpc_endpoint_service" "dynamodb" {
@@ -163,7 +157,6 @@ data "aws_vpc_endpoint_service" "dynamodb" {
 
 resource "aws_vpc_endpoint" "dynamodb" {
   count = "${var.enable_dynamodb_endpoint}"
-  //count = 0
 
   vpc_id       = "${aws_vpc.mod.id}"
   service_name = "${data.aws_vpc_endpoint_service.dynamodb.service_name}"
@@ -173,7 +166,6 @@ resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
   count = "${var.enable_dynamodb_endpoint ? length(var.private_subnets) : 0}"
 
   vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
-  //vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb[count.index]}"
   route_table_id  = "${element(aws_route_table.private.*.id, count.index)}"
 }
 
@@ -181,9 +173,7 @@ resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
   count = "${var.enable_dynamodb_endpoint ? length(var.public_subnets) : 0}"
 
   vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb.id}"
-  //vpc_endpoint_id = "${aws_vpc_endpoint.dynamodb[count.index]}"
   route_table_id  = "${aws_route_table.public.id}"
-  //route_table_id  = "${aws_route_table.public[count.index]}"
 }
 
 resource "aws_route_table_association" "private" {
@@ -212,5 +202,4 @@ resource "aws_route_table_association" "public" {
 
   subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
   route_table_id = "${aws_route_table.public.id}"
-  //route_table_id = "${aws_route_table.public[count.index]}"
 }
