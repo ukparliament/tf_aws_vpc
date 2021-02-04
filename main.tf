@@ -30,7 +30,8 @@ resource "aws_route" "public_internet_gateway" {
   //route_table_id         = "${aws_route_table.public.id}"
   route_table_id            = "${aws_route_table.public[count.index]}"
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.mod.id}"
+  //gateway_id             = "${aws_internet_gateway.mod.id}"
+  gateway_id             = "${aws_internet_gateway.mod[count.index]}"
 }
 
 resource "aws_route" "private_nat_gateway" {
@@ -149,8 +150,8 @@ resource "aws_vpc_endpoint_route_table_association" "private_s3" {
 resource "aws_vpc_endpoint_route_table_association" "public_s3" {
   count = "${var.enable_s3_endpoint ? length(var.public_subnets) : 0}"
 
-  //vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"
-  vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
+  vpc_endpoint_id = "${aws_vpc_endpoint.s3[count.index]}"
+  //vpc_endpoint_id = "${aws_vpc_endpoint.s3.id}"
   //route_table_id  = "${aws_route_table.public.id}"
   route_table_id  = "${aws_route_table.public[count.index]}"
 }
